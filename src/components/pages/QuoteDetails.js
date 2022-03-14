@@ -1,4 +1,4 @@
-import { useParams, Route, Link, useRouteMatch } from "react-router-dom";
+import { useParams, Route, Routes, Link, useLocation } from "react-router-dom";
 import Comments from "../comments/Comments";
 import HighlightedQuote from "./../quotes/HighlightedQuote";
 import useHttp from "./../hooks/use-http";
@@ -9,7 +9,6 @@ import LoadingSpinner from "../UI/LoadingSpinner";
 const QuoteDetails = () => {
   const params = useParams();
   const { quoteId } = params;
-  const match = useRouteMatch();
   const {
     sendRequest,
     status,
@@ -17,7 +16,8 @@ const QuoteDetails = () => {
     error,
   } = useHttp(getSingleQuote, true);
 
-  console.log(match);
+  const { pathname } = useLocation();
+  console.log(pathname);
 
   useEffect(() => {
     sendRequest(quoteId);
@@ -42,16 +42,19 @@ const QuoteDetails = () => {
   return (
     <section>
       <HighlightedQuote {...quote} />
-      <Route path={match.path} exact>
-        <div className="centered">
-          <Link className="btn--flat" to={`${match.url}/comments`}>
-            Load Comments
-          </Link>
-        </div>
-      </Route>
-      <Route path={`${match.path}/comments`}>
-        <Comments />
-      </Route>
+      <Routes>
+        <Route
+          path=""
+          element={
+            <div className="centered">
+              <Link className="btn--flat" to={`${pathname}/comments`}>
+                Load Comments
+              </Link>
+            </div>
+          }
+        />
+        <Route path={`/comments`} element={<Comments />} />
+      </Routes>
     </section>
   );
 };
